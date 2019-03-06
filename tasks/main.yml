@@ -10,6 +10,7 @@
     body_format: json
   delegate_to: "{{ local_mgmt_ip | default(ansible_default_ipv4.address) }}"
 
+
 - name: Add analytics consumer group
   uri:
     user: '{{ opdk_user_email }}'
