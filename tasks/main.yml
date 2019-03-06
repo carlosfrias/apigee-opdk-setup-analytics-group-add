@@ -8,6 +8,7 @@
     method: POST
     url: http://{{ local_mgmt_ip }}:8080/v1/analytics/groups/{{ new_ax_group }}
     body_format: json
+  delegate_to: "{{ local_mgmt_ip | default(ansible_default_ipv4.address) }}"
 
 - name: Add analytics consumer group
   uri:
@@ -16,6 +17,7 @@
     method: POST
     url: http://{{ local_mgmt_ip }}:8080/v1/analytics/groups/{{ new_ax_group }}/consumer-groups/?name={{ new_consumer_group }}
     body_format: json
+  delegate_to: "{{ local_mgmt_ip | default(ansible_default_ipv4.address) }}"
 
 - name: Add analytics group consumer-type attribute
   uri:
@@ -24,7 +26,7 @@
     method: POST
     url: http://{{ local_mgmt_ip }}:8080/v1/analytics/groups/{{ new_ax_group }}/properties?propName=consumer-type&propValue=ax
     body_format: json
-
+  delegate_to: "{{ local_mgmt_ip | default(ansible_default_ipv4.address) }}"
 
 - name: Add analytics group region attribute
   uri:
@@ -33,4 +35,5 @@
     method: POST
     url: http://{{ local_mgmt_ip }}:8080/v1/analytics/groups/{{ new_ax_group }}/properties?propName=region&propValue={{ region }}
     body_format: json
+  delegate_to: "{{ local_mgmt_ip | default(ansible_default_ipv4.address) }}"
 
