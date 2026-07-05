@@ -1,49 +1,56 @@
-Role Name
-=========
+# apigee-opdk-setup-analytics-group-add — Apigee Analytics Group (axgroup) Lifecycle
 
-A brief description of the role goes here.
+> **An Ansible role that creates an Apigee analytics (ax) group and its consumer group via the Management Server REST API** — the first step in modeling the Apigee analytics topology as a directed object graph: `axgroup → consumer-group → {consumers (qpid), datastores (postgres master/standby)} + {scopes (org, env)}`.
 
-Requirements
-------------
+> [!NOTE]
+> Engineering portfolio note — this project demonstrates Apigee analytics topology modeling and idempotent REST reconciliation. See the [skills assessment →](SKILLS-ASSESSMENT.md) for the expertise applied.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This is one role in the **analytics-topology lifecycle** — the Expert-tier sub-domain of the OPDK corpus. Ansible is the medium; the durable work is the **Apigee analytics object model** and the **ordered, idempotent reconciliation** of that topology against the Management Server.
 
-Role Variables
---------------
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
-----------------
-
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
-
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
 <!-- BEGIN Google Required Disclaimer -->
 
-# Not Google Product Clause
+## Not Google Product Clause
 
 This is not an officially supported Google product.
 <!-- END Google Required Disclaimer -->
-<!-- BEGIN Google How To Contribute -->
-# How to Contribute
 
-We'd love to accept your patches and contributions to this project. Please review our [guidelines](CONTRIBUTING.md).
-<!-- END Google How To Contribute -->
+---
+
+## What the role actually does
+
+`tasks/main.yml` performs the axgroup bootstrap against the Management Server (`/v1/analytics/groups/...`):
+
+1. **Create the analytics group** — `POST /v1/analytics/groups/{new_ax_group}`.
+2. **Create the consumer group** — `POST /v1/analytics/groups/{ax}/consumer-groups/?name={new_consumer_group}`.
+3. **Set `consumer-type=ax`** — `POST .../properties?propName=consumer-type&propValue=ax`.
+4. **Set `region`** — `POST .../properties?propName=region&propValue={region}`.
+
+Each step is wrapped in `block/rescue` with a `delegate_to` fallback to the MS host.
+
+---
+
+## When this role is used
+
+Composed into the analytics-provisioning runbooks when onboarding a new analytics group or adding a region. The full lifecycle (this role + `apigee-opdk-setup-qpid-add` + `apigee-opdk-setup-postgres-add` + `apigee-opdk-setup-scopes-add`/`-state`) creates the complete analytics topology. See the [`apigee-edge-opdk`](https://github.com/carlosfrias/apigee-edge-opdk) framework for composition playbooks.
+
+## Role variables (selected)
+
+| Variable | Purpose |
+|----------|---------|
+| `new_ax_group` | The axgroup name to create |
+| `new_consumer_group` | The consumer group name to create |
+| `region` | The region tag applied to the axgroup (multi-DC analytics) |
+| `opdk_user_email` / `opdk_user_pass` | MS API credentials |
+| `local_mgmt_ip` | The Management Server IP (with `delegate_to` fallback) |
+
+---
+
+## Provenance
+
+Authored and maintained by **Carlos Frias** during his tenure on Apigee Edge Private Cloud. One of the analytics-topology roles in the `apigee-opdk-*` corpus — the analytics object-model expertise is aggregated in the [`apigee-edge-opdk`](https://github.com/carlosfrias/apigee-edge-opdk) framework.
+
+Contributions welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## License
+
+See [LICENSE](./LICENSE).
