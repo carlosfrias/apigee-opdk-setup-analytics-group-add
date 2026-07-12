@@ -1,5 +1,8 @@
 # apigee-opdk-setup-analytics-group-add — Apigee Analytics Group (axgroup) Lifecycle
 
+> 🔄 **Evolution note:** The automation approach from this OPDK-era role has been consolidated into the `apigee-hybrid-workspace` Ansible collection. See the successor capability in the portfolio hub: [`carlosfrias/apigee-hybrid-workspace`](https://github.com/carlosfrias/apigee-hybrid-workspace) → `bap_coe/private_cloud/` and `bap_coe/apigee_hybrid/`. The collection README explains each role group’s business value and production context.
+
+
 > **An Ansible role that creates an Apigee analytics (ax) group and its consumer group via the Management Server REST API** — the first step in modeling the Apigee analytics topology as a directed object graph: `axgroup → consumer-group → {consumers (qpid), datastores (postgres master/standby)} + {scopes (org, env)}`.
 
 > [!NOTE]
